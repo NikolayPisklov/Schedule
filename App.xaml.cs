@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Schedule.DataProviders;
 using Schedule.ViewModels;
 using Schedule.Views;
 
@@ -23,7 +24,8 @@ namespace Schedule
             services.AddTransient<MainViewModel>();
             services.AddTransient<LoginViewModel>();
 
-            //Data providers in future
+            services.AddTransient<DataProviderBase>();
+            services.AddTransient<ILoginDataProvider, LoginDataProvider>();
         }
 
         protected override void OnStartup(StartupEventArgs e) 

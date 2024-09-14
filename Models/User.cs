@@ -9,7 +9,7 @@ namespace Schedule.Models
     public class User
     {
         public int Id { get; set; }
-        public string? FkStatus { get; set; }
+        public int FkStatus { get; set; }
         public string? Login { get; set; }
         public string? Password { get; set; }
         public string? Name { get; set; }
