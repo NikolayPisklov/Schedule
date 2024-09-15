@@ -23,6 +23,7 @@ namespace Schedule
 
             services.AddTransient<MainViewModel>();
             services.AddTransient<LoginViewModel>();
+            services.AddTransient<HomeViewModel>();
 
             services.AddTransient<DataProviderBase>();
             services.AddTransient<ILoginDataProvider, LoginDataProvider>();

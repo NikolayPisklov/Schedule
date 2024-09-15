@@ -1,10 +1,10 @@
 ﻿using Schedule.Command;
+using Schedule.DataProviders;
 
 namespace Schedule.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        public LoginViewModel? LoginViewModel { get; }
         public ViewModelBase? SelectedViewModel
         {
             get => _selectedViewModel;
@@ -15,13 +15,12 @@ namespace Schedule.ViewModels
             }
         }
         public DelegateCommand? SelectViewModelCommand { get; }
-        private ViewModelBase? _selectedViewModel;
+        private ViewModelBase? _selectedViewModel = new LoginViewModel(new LoginDataProvider());
 
-        public MainViewModel(LoginViewModel loginViewModel)
+        public MainViewModel()
         {
-            LoginViewModel = loginViewModel;
             SelectViewModelCommand = new DelegateCommand(SelectView);
-            _selectedViewModel = LoginViewModel;
+            Messanger.Instance.ViewChanged += OnViewChanged;
         }
 
         public async override Task LoadAsync() 
@@ -35,6 +34,12 @@ namespace Schedule.ViewModels
         public async void SelectView(object? parameter) 
         {
             SelectedViewModel = parameter as ViewModelBase;
+            await LoadAsync();
+        }
+        private async void OnViewChanged(object newViewModel)
+        {
+            // Set the SelectedViewModel to the new view model
+            SelectedViewModel = newViewModel as ViewModelBase;
             await LoadAsync();
         }
     }

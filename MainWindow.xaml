@@ -12,22 +12,24 @@
         <DataTemplate DataType="{x:Type viewModels:LoginViewModel}">
             <views:LoginView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:HomeViewModel}">
+            <views:HomeView/>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
-            <RowDefinition/>
             <RowDefinition/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
             <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
-         <!--SELECTED VIEW MODEL for giving datacontext-->
+
         <ContentControl Grid.Column="2" Grid.Row="1" 
                         Content="{Binding SelectedViewModel}"/>
 

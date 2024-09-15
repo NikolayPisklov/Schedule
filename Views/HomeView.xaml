@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-            
+        <TextBlock HorizontalAlignment="Center">Welcome home!</TextBlock>
     </Grid>
+    
 </UserControl>

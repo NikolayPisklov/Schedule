@@ -41,8 +41,6 @@ namespace Schedule.ViewModels
             }
         }
 
-        
-
         public DelegateCommand SignInCommand { get; }
 
         private string? _login;
@@ -56,12 +54,21 @@ namespace Schedule.ViewModels
             _loginDataProvider = loginDataProvider;
             SignInCommand = new DelegateCommand(SignIn);
         }
+        public void OnLoginSuccess() 
+        {
+            var homeViewModel = new HomeViewModel();
+            Messanger.Instance.Send(homeViewModel);
+        }
         private void SignIn(object? parameter) 
         {
             if (Login is not null && Password is not null)
             {
                 User? user = _loginDataProvider.GetUserByLoginDetailsAsync(Login, Password);
-                if (user is not null) MessageBox.Show($"{user.Name}, добрий день!");
+                if (user is not null)
+                {
+                    //MessageBox.Show($"{user.Name}, добрий день!");
+                    OnLoginSuccess();
+                }
                 else MessageBox.Show("Невірний логін або пароль!", _loginFailCaption, _cancelButton, _icon);
             }
             else 
