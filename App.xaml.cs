@@ -1,13 +1,40 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using Schedule.DataProviders;
+using Schedule.ViewModels;
+using Schedule.Views;
 
 namespace Schedule
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
+        private readonly ServiceProvider _serviceProvider;
+
+        public App() 
+        {
+            ServiceCollection services = new();
+            ConfigureServices(services);
+            _serviceProvider = services.BuildServiceProvider(); 
+        }
+
+        private void ConfigureServices(ServiceCollection services)
+        {
+            services.AddTransient<MainWindow>();
+
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<LoginViewModel>();
+            services.AddTransient<HomeViewModel>();
+
+            services.AddTransient<DataProviderBase>();
+            services.AddTransient<ILoginDataProvider, LoginDataProvider>();
+        }
+
+        protected override void OnStartup(StartupEventArgs e) 
+        {
+            base.OnStartup(e);
+
+            var mainWIndow = _serviceProvider.GetService<MainWindow>();
+            mainWIndow?.Show();
+        }
     }
 }
