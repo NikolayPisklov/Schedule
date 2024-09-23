@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Schedule.Services;
 
 namespace Schedule.ViewModels
 {
     public class HomeViewModel : ViewModelBase
     {
+        public HomeViewModel(UserSessionService? sessionService) 
+        {
+            base.SessionService = sessionService;
+        }
+        public HomeViewModel() { }
     }
 }

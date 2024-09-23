@@ -61,13 +61,14 @@ namespace Schedule.ViewModels
         }
         public void OnLoginSuccess() 
         {
-            var homeViewModel = new HomeViewModel();
+            var homeViewModel = new HomeViewModel(base.SessionService);
             Messanger.Instance.ViewChangedSend(homeViewModel);
         }
         public void OnSessionCreation(User user) 
         {
             var userSession = new UserSessionService(user.Id, user.FkStatus,
                 user.Name, user.Login, user.Email, GetUserStatusByFkStatus(user.FkStatus));
+            base.SessionService = userSession;
             Messanger.Instance.SessionCreationSend(userSession);
         }
         private void SignIn(object? parameter) 

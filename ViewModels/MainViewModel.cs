@@ -15,24 +15,9 @@ namespace Schedule.ViewModels
                 RaisePropertyChange();
             }
         }
-        public UserSessionService? SesssionService 
-        {
-            get => _sessionService;
-            set 
-            {
-                if(_sessionService is null) 
-                {
-                    _sessionService = value;
-                    RaisePropertyChange();
-                }               
-            }
-        }
-        public DelegateCommand? SelectViewModelCommand { get; }
         private ViewModelBase? _selectedViewModel = new LoginViewModel(new LoginDataProvider());
-        private UserSessionService? _sessionService = null;
         public MainViewModel()
         {
-            SelectViewModelCommand = new DelegateCommand(SelectView);
             Messanger.Instance.ViewChanged += OnViewChanged;
             Messanger.Instance.SessionCreation += OnSessionCreation;
         }   
@@ -43,11 +28,6 @@ namespace Schedule.ViewModels
                 await SelectedViewModel.LoadAsync();
             }
         }
-        public async void SelectView(object? parameter) 
-        {
-            SelectedViewModel = parameter as ViewModelBase;
-            await LoadAsync();
-        }
 
         private async void OnViewChanged(object newViewModel)
         {
@@ -56,7 +36,7 @@ namespace Schedule.ViewModels
         }
         private async void OnSessionCreation(object userSessionService)
         {
-            SesssionService = userSessionService as UserSessionService;
+            base.SessionService = userSessionService as UserSessionService;
             await LoadAsync();
         }
     }
