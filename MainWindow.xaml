@@ -19,6 +19,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
@@ -29,9 +30,13 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
-
-        <ContentControl Grid.Column="2" Grid.Row="1" 
+        <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal">
+            <Image Source="/Images/logo.png" Height="50"/>
+            <TextBlock FontSize="25" FontWeight="Bold" 
+                Text="School Schedule" VerticalAlignment="Center"/>
+        </StackPanel>
+        <ContentControl Grid.Column="2" Grid.Row="2" 
                         Content="{Binding SelectedViewModel}"/>
-
+        
     </Grid>
 </Window>
