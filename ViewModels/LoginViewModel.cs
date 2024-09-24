@@ -8,23 +8,24 @@ using static Schedule.Services.UserSessionService;
 namespace Schedule.ViewModels
 {
     public class LoginViewModel : ValidationViewModelBase
-    {        
-        public string? Login { 
-            get => _login; 
-            set 
-            { 
+    {
+        public string? Login
+        {
+            get => _login;
+            set
+            {
                 _login = value;
                 RaisePropertyChange();
-                if (string.IsNullOrEmpty(_login)) 
+                if (string.IsNullOrEmpty(_login))
                 {
                     AddError("Будь ласка, введіть логін!");
                 }
-                else 
+                else
                 {
                     ClearErrors();
                 }
-            } 
-        }
+            }
+        } 
         public string? Password
         {
             get => _password;
@@ -41,8 +42,8 @@ namespace Schedule.ViewModels
                     ClearErrors();
                 }
             }
-        }
-        
+        } 
+
 
         public DelegateCommand SignInCommand { get; }
 
@@ -56,6 +57,10 @@ namespace Schedule.ViewModels
         private readonly string? _loginFailCaption = "Помилка при вході до системи";
         public LoginViewModel(ILoginDataProvider loginDataProvider)
         {
+            //TEMPORARY FOR TESTING
+            Password = "admin";
+            Login = "Admin";
+            //TEMPORARY FOR TESTING
             _loginDataProvider = loginDataProvider;
             SignInCommand = new DelegateCommand(SignIn);
         }

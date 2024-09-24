@@ -1,13 +1,26 @@
-﻿using Schedule.Services;
+﻿using Schedule.Command;
+using Schedule.Services;
 
 namespace Schedule.ViewModels
 {
     public class HomeViewModel : ViewModelBase
     {
+        public DelegateCommand RedirectToClassesEditViewCommand { get; }
         public HomeViewModel(UserSessionService? sessionService) 
         {
             base.SessionService = sessionService;
+            RedirectToClassesEditViewCommand = new DelegateCommand(RedirectToClassesEditView);
         }
-        public HomeViewModel() { }
+        public HomeViewModel()
+        {
+            RedirectToClassesEditViewCommand = new DelegateCommand(RedirectToClassesEditView);
+        }
+        private void RedirectToClassesEditView(object? parameter)
+        {
+            var classesEditVIewModel = new ClassesEditViewModel();
+            Messanger.Instance.ViewChangedSend(classesEditVIewModel);
+        }
+
+        
     }
 }
