@@ -6,7 +6,75 @@
              xmlns:local="clr-namespace:Schedule.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ClassesDataTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Text="Назва класу: "/>
+                <TextBlock VerticalAlignment="Center" 
+                           Text="{Binding Title, Mode=TwoWay}" FontWeight="Bold"
+                           Margin="0 0 5 0"/>
+                <TextBlock VerticalAlignment="Center" Text="Рік набору: "/>
+                <TextBlock VerticalAlignment="Center" 
+                           Text="{Binding Year, Mode=TwoWay}" FontWeight="Bold"/>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid>
-        <TextBlock>Classes edit view</TextBlock>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <!--Classes list-->
+        <StackPanel Grid.Row="0" Visibility="{Binding IsMainFormVisible,
+            Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock FontSize="20" 
+                       HorizontalAlignment="Center"
+                       Text="Доступні класи" Margin="5"/>
+            <ListView ItemsSource="{Binding Classes, Mode=TwoWay}"
+                  ItemTemplate="{StaticResource ClassesDataTemplate}"
+                  SelectedItem="{Binding SelectedClass,Mode=TwoWay}"
+                  Grid.Row="0"/>
+        </StackPanel>
+        <!--EditButtons-->
+        <StackPanel Visibility="{Binding IsMainFormVisible,
+            Converter={StaticResource BooleanToVisibilityConverter}}" 
+            Grid.Row="1" Orientation="Horizontal" 
+            HorizontalAlignment="Center">
+            <Button Content="Додати" Command="{Binding ShowAddingFormCommand}"/>
+            <Button Content="Редагувати" Visibility="{Binding IsEditButtonVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding ShowEditFormCommand}"/>
+            <Button Content="Видалити" Visibility="{Binding IsDeleteButtonVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding DeleteClassCommand}"/>
+        </StackPanel>
+        <!--Форма додавання класу-->
+        <StackPanel x:Name="addingClassForm" Visibility="{Binding IsAddFormVisible,
+            Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Grid.Row="1" HorizontalAlignment="Center">
+            <TextBlock>Введіть назву класу</TextBlock>
+            <TextBox  Text="{Binding NewTitleForClass,Mode=TwoWay}"/>
+            <TextBlock>Введіть рік набору класу</TextBlock>
+            <TextBox  Text="{Binding Year,Mode=TwoWay}"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Зберегти" Command="{Binding AddClassCommand}"/>
+                <Button Content="Назад" Command="{Binding BackToMainFormCommand}"/>
+            </StackPanel>
+        </StackPanel>
+        <!--Форма редагування класу-->
+        <StackPanel Visibility="{Binding IsEditFormVisible,
+            Converter={StaticResource BooleanToVisibilityConverter}}" Grid.Row="1"
+                    HorizontalAlignment="Center">
+            <TextBlock>Форма редагування класу</TextBlock>
+            <TextBlock>Введіть назву класу</TextBlock>
+            <TextBox  Text="{Binding NewTitleForClass,Mode=TwoWay}"/>
+            <TextBlock>Введіть рік набору класу</TextBlock>
+            <TextBox  Text="{Binding Year,Mode=TwoWay}"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Зберегти" Command="{Binding EditClassCommand}"/>
+                <Button Content="Назад" Command="{Binding BackToMainFormCommand}"/>
+            </StackPanel>
+        </StackPanel>
+
     </Grid>
 </UserControl>

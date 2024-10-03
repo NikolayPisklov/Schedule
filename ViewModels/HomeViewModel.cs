@@ -1,4 +1,5 @@
 ﻿using Schedule.Command;
+using Schedule.DataProviders;
 using Schedule.Services;
 
 namespace Schedule.ViewModels
@@ -17,7 +18,7 @@ namespace Schedule.ViewModels
         }
         private void RedirectToClassesEditView(object? parameter)
         {
-            var classesEditVIewModel = new ClassesEditViewModel();
+            var classesEditVIewModel = new ClassesEditViewModel(new ClassesDataProvider());
             Messanger.Instance.ViewChangedSend(classesEditVIewModel);
         }
 

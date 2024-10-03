@@ -24,9 +24,11 @@ namespace Schedule
             services.AddTransient<MainViewModel>();
             services.AddTransient<LoginViewModel>();
             services.AddTransient<HomeViewModel>();
+            services.AddTransient<ClassesEditViewModel>();
 
             services.AddTransient<DataProviderBase>();
             services.AddTransient<ILoginDataProvider, LoginDataProvider>();
+            services.AddTransient<IClassesDataProvider, ClassesDataProvider>();
         }
 
         protected override void OnStartup(StartupEventArgs e) 
