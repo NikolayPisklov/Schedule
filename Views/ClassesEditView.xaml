@@ -25,7 +25,10 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <!--Classes list-->
-        <StackPanel Grid.Row="0" Visibility="{Binding IsMainFormVisible,
+        <TextBlock Text="Ще не додано жодного класу" HorizontalAlignment="Center"
+                   Visibility="{Binding IsListEmptyMessageVisible,
+                    Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <StackPanel Grid.Row="0" Visibility="{Binding IsClassListVisible,
             Converter={StaticResource BooleanToVisibilityConverter}}">
             <TextBlock FontSize="20" 
                        HorizontalAlignment="Center"
@@ -52,11 +55,13 @@
         <StackPanel x:Name="addingClassForm" Visibility="{Binding IsAddFormVisible,
             Converter={StaticResource BooleanToVisibilityConverter}}"
                     Grid.Row="1" HorizontalAlignment="Center">
+            <TextBlock FontSize="20" HorizontalAlignment="Center">
+                Форма додавання класу</TextBlock>
             <TextBlock>Введіть назву класу</TextBlock>
             <TextBox  Text="{Binding NewTitleForClass,Mode=TwoWay}"/>
             <TextBlock>Введіть рік набору класу</TextBlock>
             <TextBox  Text="{Binding Year,Mode=TwoWay}"/>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content="Зберегти" Command="{Binding AddClassCommand}"/>
                 <Button Content="Назад" Command="{Binding BackToMainFormCommand}"/>
             </StackPanel>
@@ -65,16 +70,18 @@
         <StackPanel Visibility="{Binding IsEditFormVisible,
             Converter={StaticResource BooleanToVisibilityConverter}}" Grid.Row="1"
                     HorizontalAlignment="Center">
-            <TextBlock>Форма редагування класу</TextBlock>
+            <TextBlock FontSize="20"
+                       HorizontalAlignment="Center">
+                Форма редагування класу</TextBlock>
             <TextBlock>Введіть назву класу</TextBlock>
             <TextBox  Text="{Binding NewTitleForClass,Mode=TwoWay}"/>
             <TextBlock>Введіть рік набору класу</TextBlock>
             <TextBox  Text="{Binding Year,Mode=TwoWay}"/>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content="Зберегти" Command="{Binding EditClassCommand}"/>
                 <Button Content="Назад" Command="{Binding BackToMainFormCommand}"/>
             </StackPanel>
         </StackPanel>
-
+        
     </Grid>
 </UserControl>

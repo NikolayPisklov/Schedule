@@ -14,7 +14,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Vertical"
+        <StackPanel Orientation="Vertical" 
                     Grid.Column="0" Grid.Row="0">
             <TextBlock Text="Введіть свої дані"
                        HorizontalAlignment="Center"/>
@@ -25,6 +25,7 @@
             <TextBox Text="{Binding Password, Mode=TwoWay,
                   UpdateSourceTrigger=PropertyChanged}"/>
             <Button Content="Вхід" Margin="20 10 20 10"
+                    HorizontalAlignment="Center"
                     Command="{Binding SignInCommand}"/>
         </StackPanel>
     </Grid>

@@ -7,12 +7,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <StackPanel>
+        <StackPanel HorizontalAlignment="Center">
             <Button Content="Редагувати користувачів"/>
-            
             <Button Content="Редагувати класи" 
                     Command="{Binding RedirectToClassesEditViewCommand}"/>
-            
             <Button Content="Редагувати розклади"/>
         </StackPanel>
     </Grid>

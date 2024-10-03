@@ -9,7 +9,7 @@ namespace Schedule.ViewModels
 
     public class ClassesEditViewModel : ValidationViewModelBase
     {
-        public ObservableCollection<Class> Classes { get; set; } = new ObservableCollection<Class>();//Classes dont update when deleting
+        public ObservableCollection<Class> Classes { get; set; } = new ObservableCollection<Class>();
         public Class? SelectedClass 
         {
             get => _selectedClass;
@@ -50,6 +50,24 @@ namespace Schedule.ViewModels
                 RaisePropertyChange();
             }
         }
+        public bool IsClassListVisible
+        {
+            get => _isClassListVisible;
+            set 
+            {
+                _isClassListVisible = value;
+                RaisePropertyChange();
+            }
+        }
+        public bool IsListEmptyMessageVisible 
+        {
+            get => _isListEmptyMessageVisible;
+            set 
+            {
+                _isListEmptyMessageVisible = value;
+                RaisePropertyChange();
+            }
+        }
         public string NewTitleForClass 
         {
             get => _newTitleForClass;
@@ -82,6 +100,8 @@ namespace Schedule.ViewModels
         private bool _isMainFormVisible = true;
         private bool _isAddFormVisible = false;
         private bool _isEditFormVisible = false;
+        private bool _isClassListVisible = true;
+        private bool _isListEmptyMessageVisible;
         private int? _year = null;
         private readonly MessageBoxImage _iconSuccess = MessageBoxImage.Asterisk;
         private readonly MessageBoxImage _iconFail = MessageBoxImage.Error;
@@ -111,6 +131,7 @@ namespace Schedule.ViewModels
                     Classes.Add(c);
                 }
             }
+            ClassesListVisibilityCheck();
         }
 
         private async void DeleteClass(object? obj)
@@ -127,9 +148,11 @@ namespace Schedule.ViewModels
                     await _dataProvider.DeleteClassAsync(SelectedClass.Id);
                     Classes.Remove(SelectedClass);
                     SelectedClass = null;
+                    ClassesListVisibilityCheck();
                     MessageBox.Show("Клас успішнo видалено з системи!", "Операція успішна",
-                        _cancelButton, _iconSuccess);
-                }  
+                        _cancelButton, _iconSuccess);                   
+                }
+                
             }
             
         }
@@ -177,17 +200,20 @@ namespace Schedule.ViewModels
             {
                 NewTitleForClass = SelectedClass.Title;
                 Year = SelectedClass.Year;
+                IsListEmptyMessageVisible = false;
                 IsMainFormVisible = false;
                 IsEditFormVisible = true;
+                IsClassListVisible = false;
             }           
         }
         private void ShowAddingForm(object? obj)
         {
             NewTitleForClass = string.Empty;
             Year = null;
+            IsListEmptyMessageVisible = false;
             IsAddFormVisible = true;
             IsMainFormVisible = false;
-
+            IsClassListVisible = false;
         }
         private void BackToMainForm(object? obj)
         {           
@@ -195,6 +221,7 @@ namespace Schedule.ViewModels
             IsEditFormVisible = false;
             IsMainFormVisible = true;
             SelectedClass = null;
+            ClassesListVisibilityCheck();
         }
         private async void AddNewClassToObservableCollection() 
         {
@@ -210,6 +237,19 @@ namespace Schedule.ViewModels
             var updatedClass = new Class { Title = title, Year = year, Id = id };
             int i = Classes.IndexOf(found);
             Classes[i] = updatedClass;
+        }
+        private void ClassesListVisibilityCheck()
+        {
+            if (Classes.Count == 0)
+            {
+                IsClassListVisible = false;
+                IsListEmptyMessageVisible = true;
+            }
+            else 
+            {
+                IsListEmptyMessageVisible = false;
+                IsClassListVisible = true;
+            }
         }
     }
 }
