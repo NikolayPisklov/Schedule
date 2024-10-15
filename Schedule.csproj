@@ -15,6 +15,7 @@
   <ItemGroup>
     <Folder Include="Converters\" />
     <Folder Include="Converters\" />
+    <Folder Include="CustomObservableCollections\" />
   </ItemGroup>
 
   <ItemGroup>

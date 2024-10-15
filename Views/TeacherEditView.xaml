@@ -1,0 +1,80 @@
+﻿<UserControl x:Class="Schedule.Views.TeacherEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Schedule.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <DataTemplate x:Key="TeachersDataTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Text="ПІБ вчителя: "/>
+                <TextBlock VerticalAlignment="Center" 
+                           Text="{Binding FullName, Mode=TwoWay}" FontWeight="Bold"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="SubjectsDataTemplate">
+            <TextBlock Text="{Binding Title, Mode=TwoWay}" FontWeight="Bold"/>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <!--Teachers list-->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" 
+            Visibility="{Binding IsListTeachersVisible, Converter={StaticResource 
+            BooleanToVisibilityConverter}}">
+            <TextBlock FontSize="20" 
+                       HorizontalAlignment="Center"
+                       Text="Доступні вчителі" Margin="5"/>
+            <ListView ItemsSource="{Binding Teachers, Mode=TwoWay}"
+                  ItemTemplate="{StaticResource TeachersDataTemplate}"
+                  SelectedItem="{Binding SelectedTeacher,Mode=TwoWay}"
+                  Grid.Row="0"/>
+            <!--EditButtons-->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" 
+            HorizontalAlignment="Center">
+                <Button Content="Додати" Command="{Binding ShowAddingFormCommand}"/>
+                <Button Content="Редагувати" Visibility="{Binding IsEditButtonVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding ShowEditFormCommand}"/>
+                <Button Content="Видалити" Visibility="{Binding IsDeleteButtonVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding DeleteTeacherCommand}"/>
+            </StackPanel>
+        </StackPanel>
+        
+        
+        <!--Attach teachers to subjects-->
+        <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center"
+                Visibility="{Binding IsTeacherSelected, 
+                Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Text="Список предметів вчителя" FontSize="20" Margin="5"/>
+            <ListView ItemsSource="{Binding TeachersSubjects, Mode=TwoWay}"
+                      ItemTemplate="{StaticResource SubjectsDataTemplate}"
+                      SelectedItem="{Binding SelectedSubject}"
+                      Visibility="{Binding IsSubjectListVisible,
+                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <ComboBox ItemsSource="{Binding AllSubjects}"
+                          ItemTemplate="{StaticResource SubjectsDataTemplate}"
+                          SelectedItem="{Binding SelectedSubjectForAttaching}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Width="200"/>
+                <Button Content="Додати" IsEnabled="{Binding 
+                    IsAddingAttachedSubjectButtonActive}" 
+                        Command="{Binding AttachSubjectToTeacherCommand}"/>
+            </StackPanel>
+            <Button Content="Видалити" Visibility="{Binding IsDeleteButtonSubjectVisible, 
+                    Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding DeattachTeachersSubjectCommand}" HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

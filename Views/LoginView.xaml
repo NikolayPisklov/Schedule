@@ -14,8 +14,8 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Vertical" 
-                    Grid.Column="0" Grid.Row="0">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center"
+                    Grid.Column="0" Grid.Row="0" Width="200">
             <TextBlock Text="Введіть свої дані"
                        HorizontalAlignment="Center"/>
             <TextBlock Text="Логін"/>

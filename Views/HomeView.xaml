@@ -8,7 +8,9 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <StackPanel HorizontalAlignment="Center">
-            <Button Content="Редагувати користувачів"/>
+            <TextBlock Text="Головне меню" FontSize="25" Margin="5"/>
+            <Button Content="Редагувати вчителів"
+                    Command="{Binding RedirectToTeachersEditViewCommand}"/>
             <Button Content="Редагувати класи" 
                     Command="{Binding RedirectToClassesEditViewCommand}"/>
             <Button Content="Редагувати розклади"/>

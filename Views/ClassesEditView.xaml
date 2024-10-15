@@ -29,7 +29,8 @@
                    Visibility="{Binding IsListEmptyMessageVisible,
                     Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <StackPanel Grid.Row="0" Visibility="{Binding IsClassListVisible,
-            Converter={StaticResource BooleanToVisibilityConverter}}">
+            Converter={StaticResource BooleanToVisibilityConverter}}"
+                    HorizontalAlignment="Center">
             <TextBlock FontSize="20" 
                        HorizontalAlignment="Center"
                        Text="Доступні класи" Margin="5"/>

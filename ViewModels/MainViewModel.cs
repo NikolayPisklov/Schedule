@@ -15,12 +15,37 @@ namespace Schedule.ViewModels
                 RaisePropertyChange();
             }
         }
+        public HomeViewModel HomeViewModel { get; } = new HomeViewModel();
+        public ClassesEditViewModel ClassesEditViewModel { get; } = new ClassesEditViewModel(new ClassesDataProvider());
+        public TeacherEditViewModel TeacherEditViewModel { get; } = new TeacherEditViewModel(new TeacherDataProvider(), new SubjectDataProvider());
+        public DelegateCommand SelectMenuItemCommand { get; }
         private ViewModelBase? _selectedViewModel = new LoginViewModel(new LoginDataProvider());
+        private bool _isMainMenuVisible;
+
+        public bool IsMainMenuVisible 
+        {
+            get => _isMainMenuVisible;
+            set 
+            {
+                _isMainMenuVisible = value;
+                RaisePropertyChange();
+            }
+        }
         public MainViewModel()
         {
+            SelectMenuItemCommand = new DelegateCommand(SelectMenuItem); 
             Messanger.Instance.ViewChanged += OnViewChanged;
             Messanger.Instance.SessionCreation += OnSessionCreation;
-        }   
+        }
+
+        private void SelectMenuItem(object? parameter)
+        {
+            if (parameter is not null) 
+            {
+                Messanger.Instance.ViewChangedSend(parameter);
+            }     
+        }
+
         public async override Task LoadAsync() 
         {
             if(SelectedViewModel is not null) 
@@ -37,6 +62,7 @@ namespace Schedule.ViewModels
         private async void OnSessionCreation(object userSessionService)
         {
             base.SessionService = userSessionService as UserSessionService;
+            IsMainMenuVisible = true;
             await LoadAsync();
         }
     }
