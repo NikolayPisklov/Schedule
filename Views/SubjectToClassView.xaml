@@ -6,7 +6,33 @@
         xmlns:local="clr-namespace:Schedule.Views"
         mc:Ignorable="d"
         Title="SubjectToClassView" Height="450" Width="800">
+    <Window.Resources>
+        <DataTemplate x:Key="SubjectsDataTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Text="{Binding SubjectTitle}"/>
+                <TextBlock VerticalAlignment="Center" Text=" - "/>
+                <TextBlock VerticalAlignment="Center" Text="{Binding TeachersName}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
-        <TextBlock Text="{Binding ScheduleInfo.ClassTitle}"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+            <TextBlock Text="Оберіть предмет для призначення" 
+                       HorizontalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding SubjectsInfo, Mode=TwoWay}"
+                 ItemTemplate="{StaticResource SubjectsDataTemplate}"/>
+            <TextBlock HorizontalAlignment="Center"
+                Text="Введіть кількість часів на тиждень"/>
+            <TextBox Text="{Binding Hours}" Width="40"/>
+            <Button Command="{Binding InsertCommand}" 
+                Content="Додати урок" HorizontalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+            <TextBlock Text="Призначені предмети"/>
+        </StackPanel>
     </Grid>
 </Window>

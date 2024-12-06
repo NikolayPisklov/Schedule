@@ -36,6 +36,7 @@ namespace Schedule
             services.AddTransient<ITeacherDataProvider, TeacherDataProvider>();
             services.AddTransient<ITeacherSubjectDataProvider, TeacherSubjectDataProvider>();
             services.AddTransient<IScheduleDataProvider, ScheduleDataProvider>();
+            services.AddTransient<ISubjectToClassDataProvider, SubjectToClassDataProvider>();
         }
 
         protected override void OnStartup(StartupEventArgs e) 

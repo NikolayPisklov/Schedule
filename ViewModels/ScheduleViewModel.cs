@@ -39,10 +39,11 @@ namespace Schedule.ViewModels
             if (info is not null) 
             {
                 SubjectToClassView newWindow = new SubjectToClassView();
-                var viewModel = new SubjectToClassViewModel(info, new TeacherSubjectDataProvider());
+                var viewModel = new SubjectToClassViewModel(info, new TeacherSubjectDataProvider(), new SubjectToClassDataProvider());
                 newWindow.DataContext = viewModel;
-                newWindow.Show();
                 await viewModel.LoadAsync();
+                newWindow.Show();
+                
             }
         }
     }

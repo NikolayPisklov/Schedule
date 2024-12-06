@@ -21,7 +21,7 @@ namespace Schedule.DataProviders
             {
                 var sql = @"SELECT ts.Id, FkTeacher, FkSubject, Title AS SubjectTitle, FullName AS TeachersName
                           FROM TeacherSubject ts INNER JOIN Teacher t ON ts.FkTeacher = t.Id
-                          INNER JOIN Subject s ON s.Id = ts.FkSubject";
+                          INNER JOIN Subject s ON s.Id = ts.FkSubject ORDER BY s.Title ASC; ";
                 var tsList = await connection.QueryAsync<TeacherSubjectInfo>(sql);
                 return tsList.ToList();
             }
