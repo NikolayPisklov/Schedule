@@ -53,7 +53,6 @@ namespace Schedule.ViewModels
 
         private readonly ILoginDataProvider _loginDataProvider;
         private readonly MessageBoxImage _icon = MessageBoxImage.Exclamation;
-        private readonly MessageBoxButton _cancelButton = MessageBoxButton.OK;
         private readonly string? _loginFailCaption = "Помилка при вході до системи";
         public LoginViewModel(ILoginDataProvider loginDataProvider)
         {

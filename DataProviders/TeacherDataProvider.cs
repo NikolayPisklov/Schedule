@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Schedule.Models;
-using System.Windows.Controls.Primitives;
 
 namespace Schedule.DataProviders
 {
@@ -8,23 +7,19 @@ namespace Schedule.DataProviders
     {
         Task<IEnumerable<Teacher>?> GetAllTeachersAsync();
         Task InsertTeacherAsync(Teacher teacher);
-        Task DeleteTeacherAsync(int id);
+        Task DeleteTeacherAndAttachedSubjectsAsync(int id);
         Task UpdateTeacherAsync(Teacher teacher);
         Task<Teacher> GetLatestAddedTeacherAsync();
-        Task<bool> CheckIfSlotForTeacherExistsAsync(int teacherId);
-        Task<IEnumerable<Subject>?> GetTeachersSubjects(int id);
-        Task InsertSubjectForTeacherAsync(TeacherSubject ts);
-        Task<bool> CheckIfSlotForTeacherSubjectExistsAsync(int teacherId, int subjectId);
-        Task<TeacherSubject> GetTeacherSubjectAsync(int teacherId, int subjectId);
-        Task DeleteTeachersSubjectAsync(int id);
+        Task<bool> IsSlotForTeacherExistsAsync(int teacherId);
+        
     }
     public class TeacherDataProvider : DataProviderBase, ITeacherDataProvider
     {
-        public async Task<bool> CheckIfSlotForTeacherExistsAsync(int teacherId)
+        public async Task<bool> IsSlotForTeacherExistsAsync(int teacherId)
         {
             using (var connection = CreateConnection())
             {
-                var sql = "SELECT Id FROM TeacherSubject WHERE Id = @Id";//wrong
+                var sql = "SELECT Id FROM TeacherSubject WHERE Id = @Id";
                 int teacherSubjectId = await connection.ExecuteScalarAsync<int>(sql, new {Id = teacherId });
                 sql = "SELECT EXISTS(SELECT 1 FROM Slot WHERE FkTeacherSubject = @FkTeacherSubject);";
                 bool isExists = await connection.ExecuteScalarAsync<bool>(sql, 
@@ -33,11 +28,13 @@ namespace Schedule.DataProviders
             }
         }
 
-        public async Task DeleteTeacherAsync(int id)
+        public async Task DeleteTeacherAndAttachedSubjectsAsync(int id)
         {
             using (var connection = CreateConnection())
             {
-                var sql = "DELETE FROM Teacher Where Id = @Id";
+                var sql = "DELETE FROM TeacherSubject Where FkTeacher = @Id";
+                await connection.ExecuteAsync(sql, new { Id = id });
+                sql = "DELETE FROM Teacher Where Id = @Id";
                 await connection.ExecuteAsync(sql, new { Id = id });
             }
         }
@@ -75,10 +72,11 @@ namespace Schedule.DataProviders
         {
             using (var connection = CreateConnection())
             {
-                var sql = "UPDATE Class SET FullName = @FullName WHERE Id = @Id";
+                var sql = "UPDATE Teacher SET FullName = @FullName WHERE Id = @Id";
                 await connection.ExecuteAsync(sql, new
                 {
-                    FullName = teacher.FullName
+                    FullName = teacher.FullName,
+                    Id = teacher.Id
                 });
             }
         }
@@ -94,47 +92,6 @@ namespace Schedule.DataProviders
                     WHERE t.FkTeacher = @TeacherId";
                 var subjects = await connection.QueryAsync<Subject>(sql, new { TeacherId = id});
                 return subjects.ToList();
-            }
-        }
-        
-
-        public async Task<bool> CheckIfSlotForTeacherSubjectExistsAsync(int teacherId, int subjectId)
-        {
-            using (var connection = CreateConnection())
-            {
-                var sql = "SELECT Id FROM TeacherSubject WHERE FkTeacher = @FkTeacher AND FkSubject = @FkSubject";
-                int teacherSubjectId = await connection.ExecuteScalarAsync<int>(sql, new { FkTeacher = teacherId, FkSubject = subjectId });
-                sql = "SELECT EXISTS(SELECT 1 FROM Slot WHERE FkTeacherSubject = @FkTeacherSubject);";
-                bool isExists = await connection.ExecuteScalarAsync<bool>(sql,
-                    new { FkTeacherSubject = teacherSubjectId });
-                return isExists;
-            }
-        }
-        public async Task<TeacherSubject> GetTeacherSubjectAsync(int teacherId, int subjectId) 
-        {
-            using (var connection = CreateConnection())
-            {
-                var sql = @"SELECT * FROM TeacherSubject WHERE FkTeacher = @FkTeacher AND FkSubject = @FkSubject";
-                var ts = await connection.QuerySingleAsync<TeacherSubject>(sql, new { FkTeacher = teacherId, FkSubject = subjectId });
-                return ts;
-            }
-        }
-
-        public async Task InsertSubjectForTeacherAsync(TeacherSubject ts)
-        {
-            using (var connection = CreateConnection())
-            {
-                var sql = "INSERT INTO TeacherSubject (FkTeacher, FkSubject) VALUES (@FkTeacher, @FkSubject)";
-                await connection.ExecuteAsync(sql, ts);
-            }
-        }
-
-        public async Task DeleteTeachersSubjectAsync(int id)
-        {
-            using (var connection = CreateConnection())
-            {
-                var sql = "DELETE FROM TeacherSubject Where Id = @Id";
-                await connection.ExecuteAsync(sql, new { Id = id });
             }
         }
     }

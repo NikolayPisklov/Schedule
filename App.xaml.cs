@@ -26,12 +26,16 @@ namespace Schedule
             services.AddTransient<HomeViewModel>();
             services.AddTransient<ClassesEditViewModel>();
             services.AddTransient<TeacherEditViewModel>();
+            services.AddTransient<ScheduleViewModel>();
+            services.AddTransient<SubjectToClassViewModel>();
 
             services.AddTransient<DataProviderBase>();
             services.AddTransient<ILoginDataProvider, LoginDataProvider>();
             services.AddTransient<ISubjectDataProvider, SubjectDataProvider>();
             services.AddTransient<IClassesDataProvider, ClassesDataProvider>();
             services.AddTransient<ITeacherDataProvider, TeacherDataProvider>();
+            services.AddTransient<ITeacherSubjectDataProvider, TeacherSubjectDataProvider>();
+            services.AddTransient<IScheduleDataProvider, ScheduleDataProvider>();
         }
 
         protected override void OnStartup(StartupEventArgs e) 

@@ -21,15 +21,22 @@
         <DataTemplate DataType="{x:Type viewModels:TeacherEditViewModel}">
             <views:TeacherEditView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ScheduleViewModel}">
+            <views:ScheduleView/>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="10"/>
             <RowDefinition/>
+            <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal"
                     HorizontalAlignment="Center">
@@ -38,13 +45,14 @@
                 Text="School Schedule" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <ScrollViewer Grid.Column="1" Grid.Row="2" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="1" Grid.Row="3" VerticalScrollBarVisibility="Auto">
             <ContentControl  Content="{Binding SelectedViewModel}"/>
         </ScrollViewer>
         
         
         <Menu FontSize="15" Visibility="{Binding IsMainMenuVisible, 
-            Converter={StaticResource BooleanToVisibilityConverter}}">
+            Converter={StaticResource BooleanToVisibilityConverter}}"
+              Grid.Column="1">
             <MenuItem Header="_Головна" Command="{Binding SelectMenuItemCommand}"
                           CommandParameter="{Binding HomeViewModel }"/>
             <MenuItem Header="_Редагування">
@@ -52,6 +60,8 @@
                       CommandParameter="{Binding ClassesEditViewModel}"/>
                 <MenuItem Header="_Вчителі" Command="{Binding SelectMenuItemCommand}"
                       CommandParameter="{Binding TeacherEditViewModel}"/>
+                <MenuItem Header="_Розклади" Command="{Binding SelectMenuItemCommand}"
+                      CommandParameter="{Binding ScheduleViewModel}"/>
             </MenuItem>
         </Menu>
     </Grid>

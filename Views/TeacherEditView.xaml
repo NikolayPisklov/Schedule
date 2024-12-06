@@ -39,8 +39,7 @@
                   SelectedItem="{Binding SelectedTeacher,Mode=TwoWay}"
                   Grid.Row="0"/>
             <!--EditButtons-->
-            <StackPanel Grid.Row="1" Orientation="Horizontal" 
-            HorizontalAlignment="Center">
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content="Додати" Command="{Binding ShowAddingFormCommand}"/>
                 <Button Content="Редагувати" Visibility="{Binding IsEditButtonVisible, 
                     Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -50,8 +49,34 @@
                     Command="{Binding DeleteTeacherCommand}"/>
             </StackPanel>
         </StackPanel>
-        
-        
+        <!--Adding form-->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center"
+                Visibility="{Binding IsAddingFormVisible, 
+                Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock FontSize="20" 
+                       HorizontalAlignment="Center"
+                       Text="Форма додавання вчителя" Margin="5"/>
+            <TextBlock Text="Введіть ПІБ вчителя" HorizontalAlignment="Center"/>
+            <TextBox Width="150" Text="{Binding NewTeachersName}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Зберегти" Command="{Binding AddTeacherCommand}"/>
+                <Button Content="Назад" Command="{Binding BackToMainFormCommand}"/>
+            </StackPanel>
+        </StackPanel>
+        <!--Edit form-->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center"
+                Visibility="{Binding IsEditFormVisible, 
+                Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock FontSize="20" 
+                       HorizontalAlignment="Center"
+                       Text="Форма редагування вчителя" Margin="5"/>
+            <TextBlock Text="Введіть ПІБ вчителя" HorizontalAlignment="Center"/>
+            <TextBox Width="150" Text="{Binding EditedTeacherName}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Зберегти" Command="{Binding EditTeacherCommand}"/>
+                <Button Content="Назад" Command="{Binding BackToMainFormCommand}"/>
+            </StackPanel>
+        </StackPanel>
         <!--Attach teachers to subjects-->
         <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center"
                 Visibility="{Binding IsTeacherSelected, 

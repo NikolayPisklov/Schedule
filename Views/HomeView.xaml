@@ -9,11 +9,14 @@
     <Grid>
         <StackPanel HorizontalAlignment="Center">
             <TextBlock Text="Головне меню" FontSize="25" Margin="5"/>
-            <Button Content="Редагувати вчителів"
+            <Button Content="Робота з вчителями"
                     Command="{Binding RedirectToTeachersEditViewCommand}"/>
-            <Button Content="Редагувати класи" 
+            <Button Content="Робота з класами" 
                     Command="{Binding RedirectToClassesEditViewCommand}"/>
-            <Button Content="Редагувати розклади"/>
+            <Button Content="Робота з предметами"/>
+            <Button Content="Робота з аудиторіями"/>
+            <Button Content="Робота з часовими слотами"/>
+            <Button Content="Робота з розкладом"/>
         </StackPanel>
     </Grid>
     
