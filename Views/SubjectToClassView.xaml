@@ -14,6 +14,16 @@
                 <TextBlock VerticalAlignment="Center" Text="{Binding TeachersName}"/>
             </StackPanel>
         </DataTemplate>
+        <DataTemplate x:Key="ClassSubjects">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Text="{Binding Title}"/>
+                <TextBlock VerticalAlignment="Center" Text=" - "/>
+                <TextBlock VerticalAlignment="Center" Text="{Binding FullName}"/>
+                <TextBlock VerticalAlignment="Center" Text=" - "/>
+                <TextBlock VerticalAlignment="Center" Text="{Binding Hours}"/>
+                <TextBlock Text=" годин"/>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -24,15 +34,21 @@
             <TextBlock Text="Оберіть предмет для призначення" 
                        HorizontalAlignment="Center"/>
             <ComboBox ItemsSource="{Binding SubjectsInfo, Mode=TwoWay}"
-                 ItemTemplate="{StaticResource SubjectsDataTemplate}"/>
+                 ItemTemplate="{StaticResource SubjectsDataTemplate}"
+                 SelectedItem="{Binding SelectedTs}"/>
             <TextBlock HorizontalAlignment="Center"
                 Text="Введіть кількість часів на тиждень"/>
             <TextBox Text="{Binding Hours}" Width="40"/>
             <Button Command="{Binding InsertCommand}" 
                 Content="Додати урок" HorizontalAlignment="Center"/>
         </StackPanel>
-        <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+        <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top">
             <TextBlock Text="Призначені предмети"/>
+            <ListBox ItemsSource="{Binding AssignedSubjects,Mode=TwoWay}"
+                     ItemTemplate="{StaticResource ClassSubjects}"
+                     SelectedItem="{Binding SelectedSubjectToClass}"/>
+            <Button Command="{Binding DeleteCommand}" Content="Видалити"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Window>

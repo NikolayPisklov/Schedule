@@ -7,180 +7,56 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
         </Grid.RowDefinitions>
-        <!--Days of the week-->
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Понеділок"
+        <Grid x:Name="scheduleGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <!--Days of the week-->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Понеділок"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock.LayoutTransform>
-                <RotateTransform Angle="-90" />
-            </TextBlock.LayoutTransform>
-        </TextBlock>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Вівторок"
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="-90" />
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Вівторок"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock.LayoutTransform>
-                <RotateTransform Angle="-90" />
-            </TextBlock.LayoutTransform>
-        </TextBlock>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Середа"
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="-90" />
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Середа"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock.LayoutTransform>
-                <RotateTransform Angle="-90" />
-            </TextBlock.LayoutTransform>
-        </TextBlock>
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Четвер"
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="-90" />
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Четвер"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock.LayoutTransform>
-                <RotateTransform Angle="-90" />
-            </TextBlock.LayoutTransform>
-        </TextBlock>
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="П'ятниця"
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="-90" />
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="П'ятниця"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock.LayoutTransform>
-                <RotateTransform Angle="-90" />
-            </TextBlock.LayoutTransform>
-        </TextBlock>
-        <!--Classes-->
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[0].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="-90" />
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+        </Grid>
+        <StackPanel Grid.Row="1">
+            <Button Content="Скласти розклад" Command="{Binding CreateScheduleCommand}"/>
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[1].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[2].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="4" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[3].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="5" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[4].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="6" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[5].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="7" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[6].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="8" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[7].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="9" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[8].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="10" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[9].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" />
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="11" Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-            <TextBlock Text="{Binding SchedulesInfo[10].ClassTitle}" 
-                       HorizontalAlignment="Center"/>
-            <Button Content="Назначені предмети" 
-                    Command="{Binding OpenWindowForAssigningSubjectsCommand}"
-                    CommandParameter="{Binding SchedulesInfo[10]}"/>
-        </StackPanel>
-        <!--Borders-->
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="0" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="1" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="2" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="3" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="4" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="5" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="6" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="7" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="8" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="9" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="10" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="11" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="12" Grid.Row="0" Grid.RowSpan="6"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="13" Grid.Row="0" Grid.RowSpan="6"/>
-        
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="13"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="13"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="13"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="13"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="13"/>
-        <Border BorderThickness="0.5" BorderBrush="Black" 
-            Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="13"/>
     </Grid>
 </UserControl>

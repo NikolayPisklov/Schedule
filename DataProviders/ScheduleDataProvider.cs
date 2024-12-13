@@ -8,6 +8,9 @@ namespace Schedule.DataProviders
     {
         Task<IEnumerable<ScheduleJoin>?> GetSchedulesForAYearAsync();
         Task<IEnumerable<DayOfTheWeek?>> GetDaysOfTheWeek();
+        Task<List<int>> GetDaysId();
+        Task<List<int>> GetTimeId();
+
     }
     public class ScheduleDataProvider : DataProviderBase, IScheduleDataProvider
     {
@@ -15,9 +18,10 @@ namespace Schedule.DataProviders
         {
             using (var connection = CreateConnection())
             {
-                var sql = @"SELECT s.Id AS ScheduleId, Title AS ClassTitle, s.Year AS ScheduleYear 
+                //CHANGE!!!!
+                var sql = @"SELECT s.Id AS ScheduleId, FkClass AS ClassId, Title AS ClassTitle, s.Year AS ScheduleYear 
                     FROM Schedule s INNER JOIN Class c ON s.FkClass = c.Id
-                    WHERE s.Id >= 10;";
+                    WHERE s.Id >= 9;";
                 var schedules = await connection.QueryAsync<ScheduleJoin>(sql);
                 return schedules.ToList();
             }
@@ -29,6 +33,24 @@ namespace Schedule.DataProviders
                 var sql = "SELECT * FROM DayOfTheWeek";
                 var days = await connection.QueryAsync<DayOfTheWeek>(sql);
                 return days.ToList();
+            }
+        }
+        public async Task<List<int>> GetDaysId() 
+        {
+            using (var connection = CreateConnection()) 
+            {
+                var sql = "SELECT Id FROM DayOfTheWeek";
+                var days = await connection.QueryAsync<int>(sql);
+                return days.ToList();
+            }
+        }
+        public async Task<List<int>> GetTimeId()
+        {
+            using (var connection = CreateConnection())
+            {
+                var sql = "SELECT Id FROM Time";
+                var times = await connection.QueryAsync<int>(sql);
+                return times.ToList();
             }
         }
     }
