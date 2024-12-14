@@ -18,7 +18,7 @@ namespace Schedule.DataProviders
         {
             using (var connection = CreateConnection())
             {
-                var sql = @"SELECT sc.Id, FkTs, FkSchedule, Hours, DifficultCoefficient FROM SubjectToClass sc
+                var sql = @"SELECT sc.Id, FkTs, FkSchedule, FkTeacher, Hours, DifficultCoefficient FROM SubjectToClass sc
                     INNER JOIN Schedule sch ON sc.FkSchedule = sch.Id
                     INNER JOIN TeacherSubject ts ON sc.FkTs = ts.Id
                     INNER JOIN Subject s ON ts.FkSubject = s.Id 

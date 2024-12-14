@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using Schedule.Command;
 using Schedule.DataProviders;
 using Schedule.Models;
@@ -20,19 +21,22 @@ namespace Schedule.ViewModels
         public Dictionary<(int day, int time), bool> SlotsAvailability { get; set; } = new Dictionary<(int day, int time), bool>();
         public List<TakenSlotInfo> TakenSlots { get; set; } = new List<TakenSlotInfo>();
         public List<ScheduleSubjectToClass> YearSubjectsToClass = new List<ScheduleSubjectToClass>();
+        public List<SlotInfo> SlotsForTheView { get; set; } = new List<SlotInfo>();
 
         public int ClassesCount { get; set; }
 
         private readonly IScheduleDataProvider _dataProvider;
         private readonly ISubjectToClassDataProvider _subjectToClassDataProvider;
+        private readonly ISlotDataProvider _slotDataProvider;
 
         public DelegateCommand OpenWindowForAssigningSubjectsCommand { get; }
         public DelegateCommand CreateScheduleCommand { get; }
 
-        public ScheduleViewModel(IScheduleDataProvider scheduleDataProvider, ISubjectToClassDataProvider scdp) 
+        public ScheduleViewModel(IScheduleDataProvider scheduleDataProvider, ISubjectToClassDataProvider scdp, ISlotDataProvider slotDataProvider) 
         {
             _dataProvider = scheduleDataProvider;
             _subjectToClassDataProvider = scdp;
+            _slotDataProvider = slotDataProvider;
             OpenWindowForAssigningSubjectsCommand = new DelegateCommand(OpenWindowForAssigningSubjects);
             CreateScheduleCommand = new DelegateCommand(CreateSchedule);
         }
@@ -85,38 +89,74 @@ namespace Schedule.ViewModels
                 }
             }
         }
-        public async void CreateSchedule(object? obj) //For now it is for one class ()
+        public async void CreateSchedule(object? obj) //For now it is for one class
         {
             YearSubjectsToClass = await _subjectToClassDataProvider.GetAllSubjectToClassForAYear(2024);
             var list = YearSubjectsToClass.OrderByDescending(x => x.DifficultCoefficient).OrderBy(x => x.FkSchedule).ToList();
-            //Algorithm !!!THIS IS ONLY FOR ONE CLASS!!!
+            //Algorithm !!!THIS IS ONLY FOR ONE CLASS!!! because dictionary needs to be updated to every class (all true at the beggining)
             int i = 0;
             while (i < list.Count) 
             {
-                var subject = list[i];
-                bool isAppointed = false;
-                var availableSlots = SlotsAvailability.Where(x => x.Value);
+                var slotInfo = list[i];
+                var availableSlots = SlotsAvailability.Where(x => x.Value == true);
                 foreach(var slot in availableSlots) 
                 {
-                    if(IsTeacherAvailable() && IsClassAvailable()) 
+                    if(IsSlotEmpty(slotInfo, slot.Key) && slot.Value == true) 
                     {
-                        //Adding to list of global taken slots. Get slot to taken in the dictionary
-                        isAppointed = true;
+                        //Adding to list of global taken slots. Get slot to taken in the dictionary, - hour
+                        SlotsAvailability[slot.Key] = false;
+                        AddSlotToTakenSlots(slotInfo, slot.Key);
+                        list[i].Hours -= 1;
+                        break;
                     }
                 }
-                if(isAppointed) 
+                if (list[i].Hours < 1) 
                 {
                     i++;
                 }
             }
+            OnSchedulingCompleted();
         }
-        private bool IsTeacherAvailable() //searching through global slot list
+        public async void OnSchedulingCompleted() 
         {
-            return true;
+            foreach (var slot in TakenSlots) 
+            {
+                await _slotDataProvider.InsertSlotAsync(slot);
+            }
+            var slotInfos = await _slotDataProvider.GetSlotsInfoForScheduleAsync(2024);
+            foreach(var slot in slotInfos) 
+            {
+                SlotsForTheView.Add(slot);
+            }
+            Messanger.Instance.ScheduleDoneSend();
         }
-        private bool IsClassAvailable() //searching through global slot list
+        private bool IsSlotEmpty(ScheduleSubjectToClass slotInfo, (int, int) dayTime)
         {
-            return true;
+            var takenSlot = TakenSlots.FirstOrDefault(x => x.TeacherId == slotInfo.FkTeacher && x.ScheduleId == slotInfo.FkSchedule
+                && x.DayId == dayTime.Item1 && x.TimeId == dayTime.Item2);
+            if (takenSlot == null) 
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
         }
+        private void AddSlotToTakenSlots(ScheduleSubjectToClass slotInfo, (int, int) dayTime) 
+        {
+            TakenSlotInfo newSlot = new TakenSlotInfo() 
+            {
+                SubjectToClassId = slotInfo.Id,
+                ScheduleId = slotInfo.FkSchedule,
+                TeacherSubjectId = slotInfo.FkTs,
+                TeacherId = slotInfo.FkTeacher,
+                ClassroomId = 1, // later add for classroom constraint
+                DayId = dayTime.Item1,
+                TimeId = dayTime.Item2
+            };
+            TakenSlots.Add(newSlot);
+        }
+
     }
 }

@@ -1,5 +1,7 @@
-﻿using Schedule.Models.CombinedModels;
+﻿using Schedule.Command;
+using Schedule.Models.CombinedModels;
 using Schedule.ViewModels;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,6 +19,7 @@ namespace Schedule.Views
         {
             InitializeComponent();
             this.Loaded += ViewLoaded;
+            Messanger.Instance.ScheduleDone += OnScheduleDone;
         }
         private void ViewLoaded(object sender, RoutedEventArgs e)
         {
@@ -97,5 +100,28 @@ namespace Schedule.Views
             }
         }
         //Schedule work
+        public void OnScheduleDone() 
+        {
+            var viewModel = this.DataContext as ScheduleViewModel;
+            var slots = viewModel.SlotsForTheView;
+            for(int c = 0; c < viewModel.ClassesCount; c++) 
+            {
+                for(int i = 1; i <= viewModel.DaysIds.Count; i++) 
+                {
+                    ListView newListView = new ListView();
+                    for (int j = 1; j <= viewModel.TimeIds.Count; j++)
+                    {
+                        var slot = slots.FirstOrDefault(x => x.TimeId == j && x.DayId == i && x.ClassId == viewModel.SchedulesInfo[c].ClassId);//how to determine column?
+                        if(slot is not null) 
+                        {
+                            newListView.Items.Add($"{slot.SubjectTitle}-{slot.FullName}");
+                        }
+                    }
+                    Grid.SetRow(newListView, i);
+                    Grid.SetColumn(newListView, c);
+                    scheduleGrid.Children.Add(newListView);
+                }
+            }
+        }
     }
 }
