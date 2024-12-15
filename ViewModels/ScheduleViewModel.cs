@@ -92,16 +92,22 @@ namespace Schedule.ViewModels
         public async void CreateSchedule(object? obj) //For now it is for one class
         {
             YearSubjectsToClass = await _subjectToClassDataProvider.GetAllSubjectToClassForAYear(2024);
+            
             var list = YearSubjectsToClass.OrderByDescending(x => x.DifficultCoefficient).OrderBy(x => x.FkSchedule).ToList();
-            //Algorithm !!!THIS IS ONLY FOR ONE CLASS!!! because dictionary needs to be updated to every class (all true at the beggining)
+            var difficultSubjects = list.Where(x => x.DifficultCoefficient >= 1.7).ToList();
+            var otherSubjects = list.Where(x => x.DifficultCoefficient < 1.7).ToList();
+            
+            double sumOfHours = list.Sum(x => x.Hours);
+            double avgHours = Math.Round(sumOfHours / 5);
             int i = 0;
+            //at the beggining diff subjects and if there is no place add them to easy. Then place easy subjects into schedule
             while (i < list.Count) 
             {
                 var slotInfo = list[i];
                 var availableSlots = SlotsAvailability.Where(x => x.Value == true);
                 foreach(var slot in availableSlots) 
                 {
-                    if(IsSlotEmpty(slotInfo, slot.Key) && slot.Value == true) 
+                    if(IsSlotEmpty(slotInfo, slot.Key) && slot.Value == true && slot.Key.time <= avgHours) 
                     {
                         //Adding to list of global taken slots. Get slot to taken in the dictionary, - hour
                         SlotsAvailability[slot.Key] = false;
