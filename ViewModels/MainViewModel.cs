@@ -18,7 +18,8 @@ namespace Schedule.ViewModels
         public HomeViewModel HomeViewModel { get; } = new HomeViewModel();
         public ClassesEditViewModel ClassesEditViewModel { get; } = new ClassesEditViewModel(new ClassesDataProvider());
         public TeacherEditViewModel TeacherEditViewModel { get; } = new TeacherEditViewModel(new TeacherDataProvider(), new SubjectDataProvider());
-        public ScheduleViewModel ScheduleViewModel { get; } = new ScheduleViewModel(new ScheduleDataProvider(), new SubjectToClassDataProvider(), new SlotDataProvider());
+        public ScheduleViewModel ScheduleViewModel { get; } = new ScheduleViewModel(new ScheduleDataProvider(), new SubjectToClassDataProvider(), 
+            new SlotDataProvider(), new TeacherDataProvider());
         public DelegateCommand SelectMenuItemCommand { get; }
         private ViewModelBase? _selectedViewModel = new HomeViewModel();
         private bool _isMainMenuVisible = true;

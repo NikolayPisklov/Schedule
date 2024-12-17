@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using Schedule.Classes;
 using Schedule.Command;
 using Schedule.DataProviders;
 using Schedule.Models;
@@ -13,30 +14,39 @@ namespace Schedule.ViewModels
     {
 
         public ObservableCollection<ScheduleJoin> SchedulesInfo { get; set; } = new ObservableCollection<ScheduleJoin>();
+        public List<Teacher> Teachers { get; set; } = new List<Teacher>();
         public ObservableCollection<Class> Classes { get; set; } = new ObservableCollection<Class>();
 
         //Collections for schedule
+        public List<ScheduleSubjectToClass> LessonsForClass { get; set; } = new List<ScheduleSubjectToClass>();
         public List<int> DaysIds { get; set; } = new List<int>();
         public List<int> TimeIds { get; set; } = new List<int>();
-        public Dictionary<(int day, int time), bool> SlotsAvailability { get; set; } = new Dictionary<(int day, int time), bool>();
+        public Dictionary<(int day, int time, int clas), bool> ClassSlotsAvailability { get; set; } 
+            = new Dictionary<(int day, int time, int clas), bool>();
+        public Dictionary<(int day, int time, int teacher), bool> TeacherSlotsAvailability { get; set; }
+            = new Dictionary<(int day, int time, int teacher), bool>();
         public List<TakenSlotInfo> TakenSlots { get; set; } = new List<TakenSlotInfo>();
         public List<ScheduleSubjectToClass> YearSubjectsToClass = new List<ScheduleSubjectToClass>();
         public List<SlotInfo> SlotsForTheView { get; set; } = new List<SlotInfo>();
+        public List<AvgHoursForClass> AvgHoursForClass { get; set; } = new List<AvgHoursForClass>();
 
         public int ClassesCount { get; set; }
 
         private readonly IScheduleDataProvider _dataProvider;
         private readonly ISubjectToClassDataProvider _subjectToClassDataProvider;
         private readonly ISlotDataProvider _slotDataProvider;
+        private readonly ITeacherDataProvider _teacherDataProvider;
 
         public DelegateCommand OpenWindowForAssigningSubjectsCommand { get; }
         public DelegateCommand CreateScheduleCommand { get; }
 
-        public ScheduleViewModel(IScheduleDataProvider scheduleDataProvider, ISubjectToClassDataProvider scdp, ISlotDataProvider slotDataProvider) 
+        public ScheduleViewModel(IScheduleDataProvider scheduleDataProvider, ISubjectToClassDataProvider scdp, ISlotDataProvider slotDataProvider,
+            ITeacherDataProvider tdp) 
         {
             _dataProvider = scheduleDataProvider;
             _subjectToClassDataProvider = scdp;
             _slotDataProvider = slotDataProvider;
+            _teacherDataProvider = tdp;
             OpenWindowForAssigningSubjectsCommand = new DelegateCommand(OpenWindowForAssigningSubjects);
             CreateScheduleCommand = new DelegateCommand(CreateSchedule);
         }
@@ -48,6 +58,14 @@ namespace Schedule.ViewModels
                 foreach(var schedule in schedules) 
                 {
                     SchedulesInfo.Add(schedule);
+                }
+            }
+            var teachers = await _teacherDataProvider.GetAllTeachersAsync();
+            if(teachers is not null) 
+            {
+                foreach (var teacher in teachers) 
+                {
+                    Teachers.Add(teacher);
                 }
             }
             ClassesCount = SchedulesInfo.Count;
@@ -78,50 +96,143 @@ namespace Schedule.ViewModels
         }
         private void SetEmptySlots() 
         {
-            if(DaysIds.Any() && TimeIds.Any()) 
+            if(DaysIds.Any() && TimeIds.Any() && SchedulesInfo.Any()) 
             {
-                foreach (var day in DaysIds) 
+                foreach (var schedule in SchedulesInfo) 
                 {
-                    foreach(var time in TimeIds) 
+                    foreach (var day in DaysIds)
                     {
-                        SlotsAvailability.Add((day, time), true);
+                        foreach (var time in TimeIds)
+                        {
+                            ClassSlotsAvailability.Add((day, time, schedule.ScheduleId), true);
+                        }
                     }
                 }
+                foreach (var teacher in Teachers)
+                {
+                    foreach (var day in DaysIds)
+                    {
+                        foreach (var time in TimeIds)
+                        {
+                            TeacherSlotsAvailability.Add((day, time, teacher.Id), true);
+                        }
+                    }
+                }
+
             }
         }
         public async void CreateSchedule(object? obj) //For now it is for one class
         {
             YearSubjectsToClass = await _subjectToClassDataProvider.GetAllSubjectToClassForAYear(2024);
             
-            var list = YearSubjectsToClass.OrderByDescending(x => x.DifficultCoefficient).OrderBy(x => x.FkSchedule).ToList();
-            var difficultSubjects = list.Where(x => x.DifficultCoefficient >= 1.7).ToList();
-            var otherSubjects = list.Where(x => x.DifficultCoefficient < 1.7).ToList();
+            var list = YearSubjectsToClass.ToList();
+            CalculateAvgHoursForClasses(list);
+            var lessons = CreateLessonsForClass(list);
             
-            double sumOfHours = list.Sum(x => x.Hours);
-            double avgHours = Math.Round(sumOfHours / 5);
+            var difficulLessons = lessons.Where(x => x.DifficultCoefficient >= 1.7).ToList();
+            var otherLessons = lessons.Where(x => x.DifficultCoefficient < 1.7).ToList();
+
+            var random = new Random();
+            difficulLessons = difficulLessons.OrderBy(x=>random.Next()).ToList();
+            
             int i = 0;
-            //at the beggining diff subjects and if there is no place add them to easy. Then place easy subjects into schedule
-            while (i < list.Count) 
+            //for one class only
+            while (i < difficulLessons.Count) 
             {
-                var slotInfo = list[i];
-                var availableSlots = SlotsAvailability.Where(x => x.Value == true);
+                var slotInfo = difficulLessons[i];
+                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true && x.Key.clas == slotInfo.FkSchedule
+                    && x.Key.day >= 2 && x.Key.day <= 4).ToList();//add conddition for class id key item
+                var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
                 foreach(var slot in availableSlots) 
                 {
-                    if(IsSlotEmpty(slotInfo, slot.Key) && slot.Value == true && slot.Key.time <= avgHours) 
+                    if (!IsThereSlotInPriorityDays(availableSlots))
                     {
-                        //Adding to list of global taken slots. Get slot to taken in the dictionary, - hour
-                        SlotsAvailability[slot.Key] = false;
-                        AddSlotToTakenSlots(slotInfo, slot.Key);
-                        list[i].Hours -= 1;
+                        otherLessons.Add(slotInfo);
+                        i++;
+                        break;
+                    }
+                    if (IsTeacherFree(slotInfo, slot.Key) && IsDayHoursNormal(avgHours.AvgHours, slot.Key)) 
+                    {
+                        ClassSlotsAvailability[slot.Key] = false;
+                        AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
+                        i++;
+                        break;
+                    }      
+                }
+            }
+            i = 0;
+            otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();
+            while (i < otherLessons.Count) 
+            {
+                var slotInfo = otherLessons[i];
+                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true 
+                    && x.Key.clas == slotInfo.FkSchedule).ToList();//add conddition for class id key item
+                var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
+                foreach (var slot in availableSlots) 
+                {
+                    if(IsTeacherFree(slotInfo, slot.Key) && IsDayHoursNormal(avgHours.AvgHours, slot.Key)) 
+                    {
+                        ClassSlotsAvailability[slot.Key] = false;
+                        AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
+                        i++;
                         break;
                     }
                 }
-                if (list[i].Hours < 1) 
-                {
-                    i++;
-                }
             }
             OnSchedulingCompleted();
+        }
+        private void CalculateAvgHoursForClasses(List<ScheduleSubjectToClass> subjectsToClass) 
+        {
+            foreach (var schedule in SchedulesInfo) 
+            {
+                double sumOfHours = subjectsToClass.Where(x => x.FkSchedule == schedule.ScheduleId).Sum(x => x.Hours);
+                double hoursForClass;
+                if (sumOfHours <= 5) 
+                {
+                    hoursForClass = sumOfHours;
+                }
+                else 
+                {
+                    hoursForClass = Math.Round(sumOfHours / 5);
+                }   
+                AvgHoursForClass avg = new AvgHoursForClass
+                {
+                    FkSchedule = schedule.ScheduleId,
+                    AvgHours = hoursForClass
+                };
+                AvgHoursForClass.Add(avg);
+            }   
+        }
+        private bool IsDayHoursNormal(double avgHours, (int, int, int) clasKey)
+        {
+            var classTakenSkots = TakenSlots.Where(x=>x.DayId == clasKey.Item1 
+                && x.ScheduleId == clasKey.Item3).ToList();
+            var countHoursInDay = classTakenSkots.Count();
+            if (countHoursInDay < avgHours)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+        private bool IsTeacherFree(ScheduleSubjectToClass lesson, (int, int, int) clasKey)
+        {
+            var teacherKey = (clasKey.Item1, clasKey.Item2, lesson.FkTeacher);
+            bool isteacherFree = TeacherSlotsAvailability.TryGetValue(teacherKey, out bool value);
+            return isteacherFree;
+        }
+        private bool IsThereSlotInPriorityDays(List<KeyValuePair<(int, int, int), bool>> availableSlots) 
+        {
+            if (availableSlots.Any(x => x.Key.Item1 >= 2 && x.Key.Item1 <= 4)) 
+            {
+                return true;
+            }
+            else 
+            { 
+                return false; 
+            }
         }
         public async void OnSchedulingCompleted() 
         {
@@ -136,18 +247,18 @@ namespace Schedule.ViewModels
             }
             Messanger.Instance.ScheduleDoneSend();
         }
-        private bool IsSlotEmpty(ScheduleSubjectToClass slotInfo, (int, int) dayTime)
+        private List<ScheduleSubjectToClass> CreateLessonsForClass(List<ScheduleSubjectToClass> list) 
         {
-            var takenSlot = TakenSlots.FirstOrDefault(x => x.TeacherId == slotInfo.FkTeacher && x.ScheduleId == slotInfo.FkSchedule
-                && x.DayId == dayTime.Item1 && x.TimeId == dayTime.Item2);
-            if (takenSlot == null) 
+            var lessons = new List<ScheduleSubjectToClass>();
+            foreach (var subject in list) 
             {
-                return true;
+                while (subject.Hours >= 1) //change for 0.5 lessons as well
+                {
+                    lessons.Add(subject);
+                    subject.Hours -= 1;
+                }
             }
-            else 
-            {
-                return false;
-            }
+            return lessons;
         }
         private void AddSlotToTakenSlots(ScheduleSubjectToClass slotInfo, (int, int) dayTime) 
         {
