@@ -161,7 +161,7 @@ namespace Schedule.ViewModels
                 }
             }
             i = 0;
-            otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();
+            otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();//ed
             while (i < otherLessons.Count) 
             {
                 var slotInfo = otherLessons[i];
