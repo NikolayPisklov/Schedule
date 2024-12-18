@@ -8,7 +8,6 @@ namespace Schedule.DataProviders
     {
         Task<IEnumerable<Subject>?> GetSubjectsForTeacherAsync(int id);
         Task InsertTeacherSubjectAsync(TeacherSubject ts);
-        Task<bool> IsSlotForTeacherSubjectExistsAsync(int teacherId, int subjectId);
         Task<TeacherSubject> GetTeacherSubjectAsync(int teacherId, int subjectId);
         Task DeleteTeachersSubjectAsync(int id);
         Task<IEnumerable<TeacherSubjectInfo>> GetAllTeachersSubjectsAsync();
@@ -39,21 +38,7 @@ namespace Schedule.DataProviders
                 return subjects.ToList();
             }
         }
-        public async Task<bool> IsSlotForTeacherSubjectExistsAsync(int teacherId, int subjectId)
-        {
-            using (var connection = CreateConnection())
-            {
-                var sql = @"SELECT Id FROM TeacherSubject 
-                            WHERE FkTeacher = @FkTeacher 
-                            AND FkSubject = @FkSubject";
-                int teacherSubjectId = await connection.ExecuteScalarAsync<int>(sql, 
-                    new { FkTeacher = teacherId, FkSubject = subjectId });
-                sql = "SELECT EXISTS(SELECT 1 FROM Slot WHERE FkTeacherSubject = @FkTeacherSubject);";
-                bool isExists = await connection.ExecuteScalarAsync<bool>(sql,
-                    new { FkTeacherSubject = teacherSubjectId });
-                return isExists;
-            }
-        }
+        
         public async Task<TeacherSubject> GetTeacherSubjectAsync(int teacherId, int subjectId)
         {
             using (var connection = CreateConnection())

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using Schedule.Classes;
 using Schedule.Command;
 using Schedule.DataProviders;
@@ -141,7 +142,7 @@ namespace Schedule.ViewModels
             {
                 var slotInfo = difficulLessons[i];
                 var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true && x.Key.clas == slotInfo.FkSchedule
-                    && x.Key.day >= 2 && x.Key.day <= 4).ToList();//add conddition for class id key item
+                    && x.Key.day >= 2 && x.Key.day <= 4).ToList();
                 var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
                 foreach(var slot in availableSlots) 
                 {
@@ -154,6 +155,8 @@ namespace Schedule.ViewModels
                     if (IsTeacherFree(slotInfo, slot.Key) && IsDayHoursNormal(avgHours.AvgHours, slot.Key)) 
                     {
                         ClassSlotsAvailability[slot.Key] = false;
+                        var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
+                        TeacherSlotsAvailability[teacherSlotKey] = false;
                         AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
                         i++;
                         break;
@@ -161,18 +164,20 @@ namespace Schedule.ViewModels
                 }
             }
             i = 0;
-            otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();//ed
+            otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();
             while (i < otherLessons.Count) 
             {
                 var slotInfo = otherLessons[i];
                 var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true 
-                    && x.Key.clas == slotInfo.FkSchedule).ToList();//add conddition for class id key item
+                    && x.Key.clas == slotInfo.FkSchedule).ToList();
                 var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
                 foreach (var slot in availableSlots) 
                 {
                     if(IsTeacherFree(slotInfo, slot.Key) && IsDayHoursNormal(avgHours.AvgHours, slot.Key)) 
                     {
                         ClassSlotsAvailability[slot.Key] = false;
+                        var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
+                        TeacherSlotsAvailability[teacherSlotKey] = false;
                         AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
                         i++;
                         break;
@@ -193,7 +198,7 @@ namespace Schedule.ViewModels
                 }
                 else 
                 {
-                    hoursForClass = Math.Round(sumOfHours / 5);
+                    hoursForClass = Math.Round(sumOfHours / 5);//Add condition for avg hours because constraint for avg hours is too strong
                 }   
                 AvgHoursForClass avg = new AvgHoursForClass
                 {
@@ -220,7 +225,7 @@ namespace Schedule.ViewModels
         private bool IsTeacherFree(ScheduleSubjectToClass lesson, (int, int, int) clasKey)
         {
             var teacherKey = (clasKey.Item1, clasKey.Item2, lesson.FkTeacher);
-            bool isteacherFree = TeacherSlotsAvailability.TryGetValue(teacherKey, out bool value);
+            bool isteacherFree = TeacherSlotsAvailability[teacherKey];
             return isteacherFree;
         }
         private bool IsThereSlotInPriorityDays(List<KeyValuePair<(int, int, int), bool>> availableSlots) 

@@ -217,14 +217,7 @@ namespace Schedule.ViewModels
         {
             if (SelectedTeacher is not null && SelectedSubject is not null)
             {
-                if (await _teacherSubjectDataProvider.IsSlotForTeacherSubjectExistsAsync
-                    (SelectedTeacher.Id, SelectedSubject.Id))
-                {
-                    MessageBox.Show("Вчитель викладає даний предмет в одному з розкладів!", "Помилка",
-                    _cancelButton, _iconFail);
-                }
-                else
-                {
+                   
                     TeacherSubject ts = await _teacherSubjectDataProvider.GetTeacherSubjectAsync(SelectedTeacher.Id,
                         SelectedSubject.Id);
                     await _teacherSubjectDataProvider.DeleteTeachersSubjectAsync(ts.Id);
@@ -233,7 +226,7 @@ namespace Schedule.ViewModels
                     LoadTeachersSubjectsAsync(this, EventArgs.Empty);
                     RaisePropertyChange(nameof(TeachersSubjects));
                     RaisePropertyChange(nameof(AllSubjects));
-                }
+               
             }
         }
 
@@ -242,20 +235,12 @@ namespace Schedule.ViewModels
         {
             if (SelectedTeacher is not null)
             {
-                if (await _teacherDataProvider
-                    .IsSlotForTeacherExistsAsync(SelectedTeacher.Id))
-                {
-                    MessageBox.Show("Вчитель викладає в одному з розкладів!", "Помилка",
-                        _cancelButton, _iconFail);
-                }
-                else
-                {
-                    await _teacherDataProvider.DeleteTeacherAndAttachedSubjectsAsync(SelectedTeacher.Id);
-                    Teachers.Remove(SelectedTeacher);
-                    MessageBox.Show("Вчителя успішно видалено з системи!", "Операція успішна",
-                        _cancelButton, _iconSuccess);
-                    RaisePropertyChange(nameof(Teachers));
-                }
+                
+                await _teacherDataProvider.DeleteTeacherAndAttachedSubjectsAsync(SelectedTeacher.Id);
+                Teachers.Remove(SelectedTeacher);
+                MessageBox.Show("Вчителя успішно видалено з системи!", "Операція успішна",
+                    _cancelButton, _iconSuccess);
+                RaisePropertyChange(nameof(Teachers));
             }
         }
         private async void AddTeacher(object? obj) 
