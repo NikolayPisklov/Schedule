@@ -45,6 +45,16 @@ namespace Schedule
 
             var mainWIndow = _serviceProvider.GetService<MainWindow>();
             mainWIndow?.Show();
+            // Отображение консоли
+            ConsoleHelper.ShowConsole();
+            Console.WriteLine("Добро пожаловать в программу!");
+        }
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+
+            // Закрытие консоли при завершении программы
+            ConsoleHelper.CloseConsole();
         }
     }
 }

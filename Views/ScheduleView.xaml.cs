@@ -114,7 +114,7 @@ namespace Schedule.Views
                         var slot = slots.FirstOrDefault(x => x.TimeId == j && x.DayId == i && x.ClassId == viewModel.SchedulesInfo[c].ClassId);//how to determine column?
                         if(slot is not null) 
                         {
-                            newListView.Items.Add($"{slot.SubjectTitle}-{slot.FullName}");
+                            newListView.Items.Add($"{slot.TimeId}-{slot.SubjectTitle}-{slot.FullName}");
                         }
                     }
                     Grid.SetRow(newListView, i);
