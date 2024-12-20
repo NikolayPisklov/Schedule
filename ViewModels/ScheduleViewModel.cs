@@ -133,78 +133,112 @@ namespace Schedule.ViewModels
             var difficulLessons = lessons.Where(x => x.DifficultCoefficient >= 1.7).ToList();
             var otherLessons = lessons.Where(x => x.DifficultCoefficient < 1.7).ToList();
             var elseDiffLessons = new List<ScheduleSubjectToClass>(); 
+            var restOfTHeLessons = new List<ScheduleSubjectToClass>(); 
 
             var random = new Random();
             difficulLessons = difficulLessons.OrderBy(x=>random.Next()).ToList();
-            
+            //DIFFICULT LESSONS
             int i = 0;
             while (i < difficulLessons.Count) 
             {
+                int startingI = i;
                 var slotInfo = difficulLessons[i];
                 var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true && x.Key.clas == slotInfo.FkSchedule
                     && x.Key.day >= 2 && x.Key.day <= 4).ToList();
                 var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
                 foreach(var slot in availableSlots) 
                 {
-                    if (!IsThereSlotInPriorityDays(slotInfo, slot.Key))
+                    
+                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) | avgHours.MaxLessonADay < slot.Key.time)
                     {
-                        elseDiffLessons.Add(slotInfo);
-                        i++;
-                        break;
+                        continue;
                     }
-                    else 
+                    if (IsTeacherFree(slotInfo, slot.Key))
                     {
-                        if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) | avgHours.MaxLessonADay < slot.Key.time)
+                        if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
                         {
-                            continue;
+                            ClassSlotsAvailability[slot.Key] = false;
+                            var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
+                            TeacherSlotsAvailability[teacherSlotKey] = false;
+                            AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
+                            i++;
+                            break;
                         }
-                        if (IsTeacherFree(slotInfo, slot.Key))
-                        {
-                            if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
-                            {
-                                ClassSlotsAvailability[slot.Key] = false;
-                                var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
-                                TeacherSlotsAvailability[teacherSlotKey] = false;
-                                AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
-                                i++;
-                                break;
-                            }
-                        }
-                    }                   
+                    }
+                                       
+                }
+                if(i == startingI) 
+                {
+                    elseDiffLessons.Add(slotInfo);
+                    i++;
                 }
             }
             i = 0;
-            //otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();
-            //while (i < otherLessons.Count) 
-            //{
-            //    var slotInfo = otherLessons[i];
-            //    var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true 
-            //        && x.Key.clas == slotInfo.FkSchedule).ToList();
-            //    var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
-            //    foreach (var slot in availableSlots) 
-            //    {
-            //        if(IsTeacherFree(slotInfo, slot.Key)) //add constraint for 3 same subjects in a day
-            //        {
-            //            if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
-            //            {
-            //                ClassSlotsAvailability[slot.Key] = false;
-            //                var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
-            //                TeacherSlotsAvailability[teacherSlotKey] = false;
-            //                AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
-            //                i++;
-            //                break;
-            //            }
-            //            else if (avgHours.DivideRest > 0 
-            //                && slot.Key.time <= avgHours.AvgHours + 1)//avgHours.AvgHours + 1 So they dont add up in one day
-            //            {
-            //                i++;
-            //                //add them to another list and add then
-            //                break;
-            //            }
-            //        }
-                    
-            //    }
-            //}
+            //REST OF DIFFICULT LESSONS
+            while (i < elseDiffLessons.Count) 
+            {
+                var slotInfo = elseDiffLessons[i];
+                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true 
+                    && x.Key.clas == slotInfo.FkSchedule).ToList();
+                var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
+                foreach (var slot in availableSlots) 
+                {
+                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) | avgHours.MaxLessonADay < slot.Key.time)
+                    {
+                        continue;
+                    }
+                    if (IsTeacherFree(slotInfo, slot.Key))
+                    {
+                        if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
+                        {
+                            ClassSlotsAvailability[slot.Key] = false;
+                            var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
+                            TeacherSlotsAvailability[teacherSlotKey] = false;
+                            AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
+                            i++;
+                            break;
+                        }
+                    }
+                }
+            }
+            //OTHER LESSONS
+            otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();
+            i = 0;
+            while (i < otherLessons.Count)
+            {
+                int startingI = i;
+                var slotInfo = otherLessons[i];
+                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true 
+                    && x.Key.clas == slotInfo.FkSchedule).ToList();
+                var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
+                foreach (var slot in availableSlots)
+                {
+
+                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) | avgHours.MaxLessonADay < slot.Key.time)
+                    {
+                        continue;
+                    }
+                    if (IsTeacherFree(slotInfo, slot.Key))
+                    {
+                        if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
+                        {
+                            ClassSlotsAvailability[slot.Key] = false;
+                            var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
+                            TeacherSlotsAvailability[teacherSlotKey] = false;
+                            AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
+                            i++;
+                            break;
+                        }
+                    }
+
+                }
+                if (i == startingI)
+                {
+                    restOfTHeLessons.Add(slotInfo);
+                    i++;
+                }
+            }
+            i = 0;
             OnSchedulingCompleted();
         }
 
@@ -273,17 +307,7 @@ namespace Schedule.ViewModels
             bool isteacherFree = TeacherSlotsAvailability[teacherKey];
             return isteacherFree;
         }
-        private bool IsThereSlotInPriorityDays(ScheduleSubjectToClass lesson, (int, int, int) slot) 
-        {
-            if (slot.Item1 == 4 && slot.Item2 == 7  && !IsTeacherFree(lesson, slot)) 
-            {
-                return false;
-            }
-            else 
-            { 
-                return true; 
-            }
-        }
+             
         public async void OnSchedulingCompleted() 
         {
             foreach (var slot in TakenSlots) 
