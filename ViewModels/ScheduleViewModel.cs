@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
 using Schedule.Classes;
 using Schedule.Command;
@@ -15,21 +16,20 @@ namespace Schedule.ViewModels
     {
 
         public ObservableCollection<ScheduleJoin> SchedulesInfo { get; set; } = new ObservableCollection<ScheduleJoin>();
-        public List<Teacher> Teachers { get; set; } = new List<Teacher>();
-        public ObservableCollection<Class> Classes { get; set; } = new ObservableCollection<Class>();
+        private List<Teacher> Teachers { get; set; } = new List<Teacher>();
 
         //Collections for schedule
-        public List<ScheduleSubjectToClass> LessonsForClass { get; set; } = new List<ScheduleSubjectToClass>();
+        private List<ScheduleSubjectToClass> LessonsForClass { get; set; } = new List<ScheduleSubjectToClass>();
         public List<int> DaysIds { get; set; } = new List<int>();
         public List<int> TimeIds { get; set; } = new List<int>();
-        public Dictionary<(int day, int time, int clas), bool> ClassSlotsAvailability { get; set; } 
+        private Dictionary<(int day, int time, int clas), bool> ClassSlotsAvailability { get; set; } 
             = new Dictionary<(int day, int time, int clas), bool>();
-        public Dictionary<(int day, int time, int teacher), bool> TeacherSlotsAvailability { get; set; }
+        private Dictionary<(int day, int time, int teacher), bool> TeacherSlotsAvailability { get; set; }
             = new Dictionary<(int day, int time, int teacher), bool>();
-        public List<TakenSlotInfo> TakenSlots { get; set; } = new List<TakenSlotInfo>();
-        public List<ScheduleSubjectToClass> YearSubjectsToClass = new List<ScheduleSubjectToClass>();
+        private List<TakenSlotInfo> TakenSlots { get; set; } = new List<TakenSlotInfo>();
+        private List<ScheduleSubjectToClass> YearSubjectsToClass = new List<ScheduleSubjectToClass>();
         public List<SlotInfo> SlotsForTheView { get; set; } = new List<SlotInfo>();
-        public List<AvgHoursForClass> AvgHoursForClass { get; set; } = new List<AvgHoursForClass>();
+        private List<AvgHoursForClass> AvgHoursForClass { get; set; } = new List<AvgHoursForClass>();
 
         public int ClassesCount { get; set; }
 
@@ -132,7 +132,6 @@ namespace Schedule.ViewModels
             
             var difficulLessons = lessons.Where(x => x.DifficultCoefficient >= 1.7).ToList();
             var otherLessons = lessons.Where(x => x.DifficultCoefficient < 1.7).ToList();
-            var elseDiffLessons = new List<ScheduleSubjectToClass>(); 
             var restOfTHeLessons = new List<ScheduleSubjectToClass>(); 
 
             var random = new Random();
@@ -149,11 +148,11 @@ namespace Schedule.ViewModels
                 foreach(var slot in availableSlots) 
                 {
                     
-                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) | avgHours.MaxLessonADay < slot.Key.time)
+                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) || avgHours.MaxLessonADay <= slot.Key.time)
                     {
                         continue;
                     }
-                    if (IsTeacherFree(slotInfo, slot.Key))
+                    if (IsTeacherFree(slotInfo, slot.Key) && IsPreviousSlotEmpty(slot.Key))
                     {
                         if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
                         {
@@ -169,38 +168,11 @@ namespace Schedule.ViewModels
                 }
                 if(i == startingI) 
                 {
-                    elseDiffLessons.Add(slotInfo);
+                    otherLessons.Add(slotInfo);
                     i++;
                 }
             }
             i = 0;
-            //REST OF DIFFICULT LESSONS
-            while (i < elseDiffLessons.Count) 
-            {
-                var slotInfo = elseDiffLessons[i];
-                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true 
-                    && x.Key.clas == slotInfo.FkSchedule).ToList();
-                var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
-                foreach (var slot in availableSlots) 
-                {
-                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) | avgHours.MaxLessonADay < slot.Key.time)
-                    {
-                        continue;
-                    }
-                    if (IsTeacherFree(slotInfo, slot.Key))
-                    {
-                        if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
-                        {
-                            ClassSlotsAvailability[slot.Key] = false;
-                            var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
-                            TeacherSlotsAvailability[teacherSlotKey] = false;
-                            AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
-                            i++;
-                            break;
-                        }
-                    }
-                }
-            }
             //OTHER LESSONS
             otherLessons = otherLessons.OrderBy(x => random.Next()).ToList();
             i = 0;
@@ -208,17 +180,17 @@ namespace Schedule.ViewModels
             {
                 int startingI = i;
                 var slotInfo = otherLessons[i];
-                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true 
+                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true
                     && x.Key.clas == slotInfo.FkSchedule).ToList();
                 var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
                 foreach (var slot in availableSlots)
                 {
 
-                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) | avgHours.MaxLessonADay < slot.Key.time)
+                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) || avgHours.MaxLessonADay <= slot.Key.time)
                     {
                         continue;
                     }
-                    if (IsTeacherFree(slotInfo, slot.Key))
+                    if (IsTeacherFree(slotInfo, slot.Key) && IsPreviousSlotEmpty(slot.Key))
                     {
                         if (IsDayHoursNormal(avgHours.AvgHours, slot.Key))
                         {
@@ -239,7 +211,42 @@ namespace Schedule.ViewModels
                 }
             }
             i = 0;
+            while (i < restOfTHeLessons.Count)
+            {
+                int startingI = i;
+                var slotInfo = restOfTHeLessons[i];
+                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true
+                    && x.Key.clas == slotInfo.FkSchedule).ToList();
+                var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
+                foreach (var slot in availableSlots)
+                {
+
+                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key) || avgHours.MaxLessonADay <= slot.Key.time)
+                    {
+                        continue;
+                    }
+                    if (IsTeacherFree(slotInfo, slot.Key) && IsPreviousSlotEmpty(slot.Key))
+                    {
+
+                        ClassSlotsAvailability[slot.Key] = false;
+                        var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
+                        TeacherSlotsAvailability[teacherSlotKey] = false;
+                        AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
+                        i++;
+                        break;
+                        
+                    }
+
+                }
+                if (i == startingI)
+                {
+                    
+                    i++;
+                }
+            }
+            //FINAL LOOP
             OnSchedulingCompleted();
+            
         }
 
         private bool IsClassHaveTwoSameSubjectsInDay(ScheduleSubjectToClass sc, (int day, int time, int clas) clasKey)
@@ -281,12 +288,6 @@ namespace Schedule.ViewModels
                 AvgHoursForClass.Add(avg);
             }   
         }
-        private int GetClassHoursForDay((int, int, int) clasKey) 
-        {
-            var classTakenSkots = TakenSlots.Where(x => x.DayId == clasKey.Item1
-                && x.ScheduleId == clasKey.Item3).ToList();
-            return classTakenSkots.Count();
-        }
         private bool IsDayHoursNormal(double avgHours, (int, int, int) clasKey)
         {
             var classTakenSkots = TakenSlots.Where(x=>x.DayId == clasKey.Item1 
@@ -307,7 +308,22 @@ namespace Schedule.ViewModels
             bool isteacherFree = TeacherSlotsAvailability[teacherKey];
             return isteacherFree;
         }
-             
+        private bool IsPreviousSlotEmpty((int day, int time, int clas) clasKey)
+        {
+            if (clasKey.time == 1)
+                return true;
+            var previousLesson = ClassSlotsAvailability.Where(x => x.Key.day == clasKey.day && x.Key.clas == clasKey.clas
+                && x.Value == false).OrderByDescending(x => x.Key.time).FirstOrDefault();
+            int sub = clasKey.time - previousLesson.Key.time;
+            if(sub > 1) 
+            {
+                return false;
+            }
+            else 
+            {
+                return true;
+            }
+        }
         public async void OnSchedulingCompleted() 
         {
             foreach (var slot in TakenSlots) 
