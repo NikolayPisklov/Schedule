@@ -211,6 +211,7 @@ namespace Schedule.ViewModels
                 }
             }
             i = 0;
+            var finalLessons = new List<ScheduleSubjectToClass>();
             while (i < restOfTHeLessons.Count)
             {
                 int startingI = i;
@@ -240,11 +241,42 @@ namespace Schedule.ViewModels
                 }
                 if (i == startingI)
                 {
-                    
+                    finalLessons.Add(slotInfo);
                     i++;
                 }
             }
+            i = 0;
             //FINAL LOOP
+            while (i < finalLessons.Count)
+            {
+                int startingI = i;
+                var slotInfo = finalLessons[i];
+                var availableSlots = ClassSlotsAvailability.Where(x => x.Value == true
+                    && x.Key.clas == slotInfo.FkSchedule).ToList();
+                var avgHours = AvgHoursForClass.First(x => x.FkSchedule == slotInfo.FkSchedule);
+                foreach (var slot in availableSlots)
+                {
+                    if (IsClassHaveTwoSameSubjectsInDay(slotInfo, slot.Key))
+                    {
+                        continue;
+                    }
+                    if (IsTeacherFree(slotInfo, slot.Key) && IsPreviousSlotEmpty(slot.Key))
+                    {
+                        ClassSlotsAvailability[slot.Key] = false;
+                        var teacherSlotKey = (slot.Key.day, slot.Key.time, slotInfo.FkTeacher);
+                        TeacherSlotsAvailability[teacherSlotKey] = false;
+                        AddSlotToTakenSlots(slotInfo, (slot.Key.day, slot.Key.time));
+                        i++;
+                        break;
+
+                    }
+
+                }
+                if (i == startingI)
+                {
+                    i++;
+                }
+            }
             OnSchedulingCompleted();
             
         }
