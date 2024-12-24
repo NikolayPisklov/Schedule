@@ -19,7 +19,7 @@ namespace Schedule.DataProviders
             using (var connection = CreateConnection())
             {
                 //CHANGE!!!!
-                var sql = @"SELECT s.Id AS ScheduleId, FkClass AS ClassId, Title AS ClassTitle, s.Year AS ScheduleYear 
+                var sql = @"SELECT s.Id AS ScheduleId, FkClass AS ClassId, Title AS ClassTitle, s.Year AS ScheduleYear, c.Year AS ClassYear
                     FROM Schedule s INNER JOIN Class c ON s.FkClass = c.Id
                     WHERE s.Id >= 9;";
                 var schedules = await connection.QueryAsync<ScheduleJoin>(sql);

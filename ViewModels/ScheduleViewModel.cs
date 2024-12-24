@@ -105,6 +105,14 @@ namespace Schedule.ViewModels
                     {
                         foreach (var time in TimeIds)
                         {
+                            //if (schedule.ScheduleYear - schedule.ClassYear <= 8 && time == 8) 
+                            //{
+                            //    ClassSlotsAvailability.Add((day, time, schedule.ScheduleId), false);
+                            //}
+                            //else 
+                            //{
+                            //    ClassSlotsAvailability.Add((day, time, schedule.ScheduleId), true);
+                            //}
                             ClassSlotsAvailability.Add((day, time, schedule.ScheduleId), true);
                         }
                     }

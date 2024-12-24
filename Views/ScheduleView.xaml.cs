@@ -104,7 +104,7 @@ namespace Schedule.Views
         {
             var viewModel = this.DataContext as ScheduleViewModel;
             var slots = viewModel.SlotsForTheView;
-            for(int c = 0; c < viewModel.ClassesCount-1; c++) 
+            for(int c = 0; c < viewModel.ClassesCount; c++) 
             {
                 for(int i = 1; i <= viewModel.DaysIds.Count; i++) 
                 {
@@ -117,8 +117,9 @@ namespace Schedule.Views
                             newListView.Items.Add($"{slot.TimeId}-{slot.SubjectTitle}-{slot.FullName}");
                         }
                     }
+                    int k = c + 1;
                     Grid.SetRow(newListView, i);
-                    Grid.SetColumn(newListView, c+1);
+                    Grid.SetColumn(newListView, k);
                     scheduleGrid.Children.Add(newListView);
                 }
             }
